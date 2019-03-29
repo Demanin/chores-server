@@ -1,0 +1,29 @@
+{
+	"name": "chores-wheel-server",
+	"version": "1.0.0",
+	"description": "A database for storing and managing chore wheels.",
+	"main": "server.js",
+	"scripts": {
+		"start": "node server.js"
+	},
+	"dependencies": {
+		"bluebird": "^3.4.7",
+		"body-parser": "^1.15.2",
+		"compression": "1.6.2",
+		"cors": "^2.8.1",
+		"express": "4.14.0",
+		"forever": "^0.15.3",
+		"lodash": "^4.17.4",
+		"nedb": "^1.8.0",
+		"npm": "^6.0.1",
+		"path": "^0.12.7",
+		"request": "^2.79.0",
+		"request-promise": "^4.1.1"
+	},
+	"keywords": [
+		"node",
+		"hyperdev",
+		"express"
+	],
+	"license": "MIT"
+}
