@@ -2,8 +2,7 @@ const bodyParser = require("body-parser");
 const compression = require("compression");
 const cors = require("cors");
 const express = require("express");
-
-Promise = require("bluebird");
+const router = require("./routes");
 
 const app = express();
 
@@ -20,7 +19,7 @@ app.use(express.static("public"));
 app.use(bodyParser.json());
 
 // Setup server routes
-require("./routes.js")(app);
+app.use("/", router);
 
 const port = process.env.PORT || 5000;
 

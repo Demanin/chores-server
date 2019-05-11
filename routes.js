@@ -1,165 +1,188 @@
 const _ = require("lodash");
 const db = require("./database");
-const Promise = require("bluebird");
-const express = require("express");
+const Router = require("express-promise-router");
 const path = require("path");
+const postgres = require("./postgres-db");
 
-const routes = (app) => {
+const router = new Router();
 
-    app.use(express.static(path.join(__dirname, 'client')));
+router.get("/api/wheels/:id", async (req, res) => {
+  const id = req.params.id;
+  let result;
 
-    app.get("/api/wheels/:_id", Promise.coroutine(function* (req, res) {
-        const _id = req.params._id;
+  try {
+    result = await postgres.wheels.find(id);
+  } catch (error) {
+    console.error("Error finding wheel in DB. error="+error.message);
 
-        db.find({ _id }, (err, docs) => {
-            if (err) {
-                console.error("Error finding wheel in DB. error="+err.message);
+    return res.sendStatus(500);
+  }
 
-                return res.sendStatus(500);
-            }
-            if (!docs || docs.length === 0) {
-                console.error("Error finding wheel in DB. error="+err.message);
-                res.status(404);
-                res.json({ message: "wheel not found" });
+  if (!result || result.length === 0) {
+      console.error("Error finding wheel in DB. error="+error.message);
+      res.status(404);
+      res.json({ message: "wheel not found" });
 
-                return;
-            }
+      return;
+  }
 
-            res.json(docs[0]);
-        });
-    }));
+  res.json(result);
+});
 
-    app.get("/api/wheels", Promise.coroutine(function* (req, res) {
-        db.find({}, (err, docs) => {
-            if (err) {
-                console.error("Error finding wheel in DB. error="+err.message);
+router.get("/api/wheels", async (req, res) => {
+  let result;
+  try {
+    result = await postgres.wheels.all();
+  } catch (error) {
+    console.error("Error finding wheels in DB. error="+error.message);
 
-                return res.sendStatus(500);
-            }
+    return res.sendStatus(500);
+  }
 
-            res.json(docs);
-        });
-    }));
+  res.json(result);
+});
 
-    app.post("/api/wheels", Promise.coroutine(function* (req, res) {
-        const title = req.body.title;
-        if (!title){
-            res.status(400);
-            res.json({ message: "Missing title" });
+router.post("/api/wheels", async (req, res) => {
+  const title = req.body.title;
+  if (!title){
+      res.status(400);
+      res.json({ message: "Missing title" });
 
-            return;
-        }
-        if ("string" !== typeof title){
-            res.status(400);
-            res.json({ message: "title must be a string" });
+      return;
+  }
+  if ("string" !== typeof title){
+      res.status(400);
+      res.json({ message: "title must be a string" });
 
-            return;
-        }
-        const turnList = req.body.turnList;
-        if (!turnList) {
-            res.status(400);
-            res.json({ message: "Missing turnList" });
+      return;
+  }
+  const turnList = req.body.turnList;
+  if (!turnList) {
+      res.status(400);
+      res.json({ message: "Missing turnList" });
 
-            return;
-        }
+      return;
+  }
+  const ownerId = req.body.ownerId;
+  if (!ownerId) {
+      res.status(400);
+      res.json({ message: "Missing ownerId" });
 
-        const isVisible = false;
+      return;
+  }
+  const priority = req.body.priority;
+  if (!priority) {
+      res.status(400);
+      res.json({ message: "Missing priority" });
 
-        db.insert({ title, turnList, isVisible }, function (err, added) {
-            if (err) {
-                console.error(
-                  "Error inserting wheel into DB. error="+err.message+", "
-                  +"title="+title+", turnList="+turnList.join()
-                );
-                res.status(500);
-                res.json({ message: "Error creating wheel" });
+      return;
+  }
 
-                return;
-            }
-            console.log("Inserted wheel into DB. wheelId="+added._id);
-            res.status(200);
-            res.json(added);
+  const isVisible = false;
 
-            return;
-        });
-    }));
+  let result;
+  try {
+    result = await postgres.wheels.insert({ ownerId, title, turnList, isVisible, priority });
+  } catch (error) {
+    console.error(
+      "Error inserting wheel into DB. error="+error.message+", "
+      +"title="+title+", turnList="+turnList.join()
+    );
+    res.status(500);
+    res.json({ message: "Error creating wheel" });
 
-    app.post("/api/wheels/:_id", Promise.coroutine(function* (req, res) {
-        const _id = req.params._id;
-        const title = req.body.title;
-        const isVisible = req.body.isVisible;
-        if (!title){
-            res.status(400);
-            res.json({ message: "Missing title" });
+    return;
+  }
 
-            return;
-        }
-        if ("string" !== typeof title){
-            res.status(400);
-            res.json({ message: "title must be a string" });
+  console.log("Inserted wheel into DB. wheelId="+result.id);
+  res.status(200);
+  res.json(result);
+});
 
-            return;
-        }
-        if ("boolean" !== typeof isVisible){
-            res.status(400);
-            res.json({ message: "isVisible must be a boolean" });
+router.post("/api/wheels/:id", async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const title = req.body.title;
+  const isVisible = req.body.isVisible;
+  if (!title){
+      res.status(400);
+      res.json({ message: "Missing title" });
 
-            return;
-        }
-        const turnList = req.body.turnList;
-        if (!turnList) {
-            res.status(400);
-            res.json({ message: "Missing turnList" });
+      return;
+  }
+  if ("string" !== typeof title){
+      res.status(400);
+      res.json({ message: "title must be a string" });
 
-            return;
-        }
+      return;
+  }
+  if ("boolean" !== typeof isVisible){
+      res.status(400);
+      res.json({ message: "isVisible must be a boolean" });
 
-        db.find({ _id }, (err, docs) => {
-            if (err) {
-                console.error("Error finding wheel in DB. error="+err.message);
-                res.status(500);
-                res.json({ message: "Error Finding wheel" });
+      return;
+  }
+  const turnList = req.body.turnList;
+  if (!turnList) {
+      res.status(400);
+      res.json({ message: "Missing turnList" });
 
-                return
-            }
-            if (!docs || docs.length === 0) {
-                res.status(400);
-                res.json({ message: "Wheel doesn't exists." });
+      return;
+  }
+  const priority = req.body.priority;
+  if (!priority) {
+      res.status(400);
+      res.json({ message: "Missing priority" });
 
-                return;
-            }
+      return;
+  }
 
-            db.update({ _id }, { $set: { title, turnList, isVisible } }, function (err, added) {
-                if (err) {
-                    console.error("Error inserting wheel into DB. error="+err.message);
-                    res.status(500);
-                    res.json({ message: "Error updating wheel." });
+  let result;
+  try {
+    result = await postgres.wheels.find(id);
+  } catch (error) {
+    console.error("Error finding wheel in DB. error="+error.message);
 
-                    return;
-                }
-                console.log("Updated wheel in DB. wheelId="+_id);
-                res.status(200);
-                res.json({title, turnList, isVisible, _id});
+    return res.sendStatus(500);
+  }
 
-                return;
-            });
-        });
-    }));
+  if (!result || result.length === 0) {
+      console.error("Error finding wheel in DB. error="+error.message);
+      res.status(404);
+      res.json({ message: "wheel not found" });
 
-    app.delete("/api/wheels/:_id", Promise.coroutine(function* (req, res) {
-        const _id = req.params._id;
+      return;
+  }
 
-        db.remove({ _id }, {}, (err, numRemoved) => {
-            if (err) {
-                res.sendStatus(500);
+  try {
+    await postgres.wheels.update({ id, title, turnList, isVisible, priority });
+  } catch (error) {
+    console.error("Error inserting wheel into DB. error="+error.message);
+    res.status(500);
+    res.json({ message: "Error updating wheel." });
 
-                throw err;
-            } else {
-                res.sendStatus(200);
-                console.log("Deleted $wheel in DB. wheelId="+_id);
-            }
-        });
-    }));
-};
+    return;
+  }
 
-module.exports = routes;
+  console.log("Updated wheel in DB. wheelId=" + id);
+  res.status(200);
+  res.json({title, turnList, isVisible, id});
+});
+
+router.delete("/api/wheels/:id", async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+
+  let result;
+  try {
+    result = await postgres.wheels.delete(id);
+  } catch (error) {
+    console.error("Error removing wheel from DB. error="+error.message);
+    res.sendStatus(500);
+
+    return;
+  }
+
+  res.sendStatus(200);
+  console.log("Deleted $wheel in DB. wheelId=" + id);
+});
+
+module.exports = router;
