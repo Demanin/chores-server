@@ -2,8 +2,7 @@ const pgp = require('pg-promise')({
   extend(obj, dc) {
     const findWheel = async (wheel) => {
       const turnList = await obj.any(
-        'SELECT t.turn_id, u.user_id, u.name FROM turns t'
-        + ' INNER JOIN users u ON u.user_id = t.user_id'
+        'SELECT t.turn_id, t.user_id FROM turns t'
         + ' WHERE t.wheel_id = $1'
         + ' ORDER BY t.priority ASC',
         [wheel.wheel_id]
@@ -15,13 +14,29 @@ const pgp = require('pg-promise')({
         isVisible: wheel.is_visible,
         priority: wheel.priority,
         turnList: turnList.map((turn) => ({
-          id: turn.turn_id,
+          priority: turn.priority,
           userId: turn.user_id,
-          name: turn.name,
         }))
       };
     };
 
+    obj.users = {
+      async all() {
+        const userList = await obj.any(
+          'SELECT user_id, name'
+          + ' FROM users'
+        );
+
+        const formattedList = await Promise.all(userList.map(async (user) => {
+          return {
+            id: user['user_id'],
+            name: user['name'],
+          };
+        }));
+
+        return formattedList;
+      }
+    }
     obj.wheels = {
       async all() {
         const wheelList = await obj.any(
@@ -56,17 +71,19 @@ const pgp = require('pg-promise')({
             [ownerId, title, isVisible, priority]
           );
 
+          if (turnList.length <= 0) {
+            return await findWheel(wheel);
+          }
+
           const queryList = turnList.map((turn, index) => {
-            const dataList = {
+            return {
               user_id: turn.userId,
               wheel_id: wheel.wheel_id,
               priority: index
             };
-
-            t.none('INSERT INTO turns ($1:name) VALUES($1:csv)', dataList);
           });
 
-          await t.batch(queryList);
+          await t.none(pgp.helpers.insert(queryList, ['user_id', 'wheel_id', 'priority'], 'turns'));
 
           return await findWheel(wheel);
         });
@@ -77,7 +94,7 @@ const pgp = require('pg-promise')({
       },
       async update({ id, title, turnList, isVisible, priority }) {
         return await obj.tx(async (t) => {
-          const wheel = t.any(
+          const wheel = await t.one(
             'UPDATE wheels'
             + ' SET title = $1, is_visible = $2, priority = $3'
             + ' WHERE wheel_id = $4 RETURNING *',
@@ -86,17 +103,19 @@ const pgp = require('pg-promise')({
 
           await t.any('DELETE FROM turns WHERE wheel_id = $1', [id]);
 
+          if (turnList.length <= 0) {
+            return await findWheel(wheel);
+          }
+
           const queryList = turnList.map((turn, index) => {
-            const dataList = {
+            return {
               user_id: turn.userId,
               wheel_id: wheel.wheel_id,
               priority: index
             };
-
-            t.none('INSERT INTO turns ($1:name) VALUES($1:csv)', dataList);
           });
 
-          await t.batch(queryList);
+          await t.none(pgp.helpers.insert(queryList, ['user_id', 'wheel_id', 'priority'], 'turns'));
 
           return await findWheel(wheel);
         });

@@ -1,5 +1,4 @@
 const _ = require("lodash");
-const db = require("./database");
 const Router = require("express-promise-router");
 const path = require("path");
 const postgres = require("./postgres-db");
@@ -42,6 +41,19 @@ router.get("/api/wheels", async (req, res) => {
   res.json(result);
 });
 
+router.get("/api/users", async (req, res) => {
+  let result;
+  try {
+    result = await postgres.users.all();
+  } catch (error) {
+    console.error("Error finding users in DB. error="+error.message);
+
+    return res.sendStatus(500);
+  }
+
+  res.json(result);
+});
+
 router.post("/api/wheels", async (req, res) => {
   const title = req.body.title;
   if (!title){
@@ -77,8 +89,13 @@ router.post("/api/wheels", async (req, res) => {
 
       return;
   }
+  const isVisible = req.body.isVisible;
+  if (!isVisible) {
+      res.status(400);
+      res.json({ message: "Missing isVisible" });
 
-  const isVisible = false;
+      return;
+  }
 
   let result;
   try {
@@ -156,7 +173,7 @@ router.post("/api/wheels/:id", async (req, res) => {
   try {
     await postgres.wheels.update({ id, title, turnList, isVisible, priority });
   } catch (error) {
-    console.error("Error inserting wheel into DB. error="+error.message);
+    console.error("Error updating wheel in DB. error="+error.message);
     res.status(500);
     res.json({ message: "Error updating wheel." });
 
