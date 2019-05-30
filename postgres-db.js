@@ -125,11 +125,11 @@ const pgp = require('pg-promise')({
 });
 
 const client = pgp({
-  user: 'chuhta',
-  password: 'admin',
-  database: 'chores',
-  host: 'localhost',
-  port: 5432,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
   max: 20,
   statement_timeout: 10000,
 });
