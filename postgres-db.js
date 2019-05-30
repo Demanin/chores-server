@@ -89,8 +89,8 @@ const pgp = require('pg-promise')({
         });
       },
       async delete(id) {
-        await obj.any('DELETE FROM wheels WHERE wheel_id = $1', [id]);
         await obj.any('DELETE FROM turns WHERE wheel_id = $1', [id]);
+        await obj.any('DELETE FROM wheels WHERE wheel_id = $1', [id]);
       },
       async update({ id, title, turnList, isVisible, priority }) {
         return await obj.tx(async (t) => {
