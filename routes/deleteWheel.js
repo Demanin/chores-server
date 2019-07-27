@@ -3,9 +3,8 @@ const postgres = require('../postgres-db');
 const deleteWheel = async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
-  let result;
   try {
-    result = await postgres.wheels.delete(id);
+    await postgres.wheels.delete(id);
   } catch (error) {
     console.error("Error removing wheel from DB. error="+error.message);
     res.sendStatus(500);

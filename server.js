@@ -29,7 +29,7 @@ app.use("/", router);
 const port = process.env.PORT || 5000;
 
 // listen for requests :)
-const listener = app.listen(port, () => {
+app.listen(port, () => {
     console.log("Starting on port "+port);
 
     console.log("Chore Wheel server up and running.");
