@@ -5,36 +5,36 @@ const updateWheel = async (req, res) => {
   const title = req.body.title;
   const isVisible = req.body.isVisible;
   if (!title){
-      res.status(400);
-      res.json({ message: "Missing title" });
+    res.status(400);
+    res.json({ message: "Missing title" });
 
-      return;
+    return;
   }
   if ("string" !== typeof title){
-      res.status(400);
-      res.json({ message: "title must be a string" });
+    res.status(400);
+    res.json({ message: "title must be a string" });
 
-      return;
+    return;
   }
   if ("boolean" !== typeof isVisible){
-      res.status(400);
-      res.json({ message: "isVisible must be a boolean" });
+    res.status(400);
+    res.json({ message: "isVisible must be a boolean" });
 
-      return;
+    return;
   }
   const turnList = req.body.turnList;
   if (!turnList) {
-      res.status(400);
-      res.json({ message: "Missing turnList" });
+    res.status(400);
+    res.json({ message: "Missing turnList" });
 
-      return;
+    return;
   }
   const priority = req.body.priority;
   if (!priority) {
-      res.status(400);
-      res.json({ message: "Missing priority" });
+    res.status(400);
+    res.json({ message: "Missing priority" });
 
-      return;
+    return;
   }
 
   let result;
@@ -47,11 +47,11 @@ const updateWheel = async (req, res) => {
   }
 
   if (!result || result.length === 0) {
-      console.error("Error finding wheel in DB. error=" + error.message);
-      res.status(404);
-      res.json({ message: "wheel not found" });
+    console.error("Error finding wheel in DB. error=" + error.message);
+    res.status(404);
+    res.json({ message: "wheel not found" });
 
-      return;
+    return;
   }
 
   try {

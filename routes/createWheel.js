@@ -3,44 +3,44 @@ const Postgres = require('../Postgres');
 const createWheel = async (req, res) => {
   const title = req.body.title;
   if (!title){
-      res.status(400);
-      res.json({ message: "Missing title" });
+    res.status(400);
+    res.json({ message: "Missing title" });
 
-      return;
+    return;
   }
   if ("string" !== typeof title){
-      res.status(400);
-      res.json({ message: "title must be a string" });
+    res.status(400);
+    res.json({ message: "title must be a string" });
 
-      return;
+    return;
   }
   const turnList = req.body.turnList;
   if (!turnList) {
-      res.status(400);
-      res.json({ message: "Missing turnList" });
+    res.status(400);
+    res.json({ message: "Missing turnList" });
 
-      return;
+    return;
   }
   const ownerId = req.body.ownerId;
   if (!ownerId) {
-      res.status(400);
-      res.json({ message: "Missing ownerId" });
+    res.status(400);
+    res.json({ message: "Missing ownerId" });
 
-      return;
+    return;
   }
   const priority = req.body.priority;
   if (!priority) {
-      res.status(400);
-      res.json({ message: "Missing priority" });
+    res.status(400);
+    res.json({ message: "Missing priority" });
 
-      return;
+    return;
   }
   const isVisible = req.body.isVisible;
   if (!isVisible) {
-      res.status(400);
-      res.json({ message: "Missing isVisible" });
+    res.status(400);
+    res.json({ message: "Missing isVisible" });
 
-      return;
+    return;
   }
 
   let result;
