@@ -1,9 +1,9 @@
-const postgres = require('../postgres-db');
+const Postgres = require('../Postgres');
 
 const getAllWheels = async (req, res) => {
   let result;
   try {
-    result = await postgres.wheels.all();
+    result = await Postgres.Wheels.all();
   } catch (error) {
     console.error("Error finding wheels in DB. error=" + error.message);
 

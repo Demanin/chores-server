@@ -1,4 +1,4 @@
-const postgres = require('../postgres-db');
+const Postgres = require('../Postgres');
 
 const createWheel = async (req, res) => {
   const title = req.body.title;
@@ -45,7 +45,7 @@ const createWheel = async (req, res) => {
 
   let result;
   try {
-    result = await postgres.wheels.insert({ ownerId, title, turnList, isVisible, priority });
+    result = await Postgres.Wheels.insert({ ownerId, title, turnList, isVisible, priority });
   } catch (error) {
     console.error(
       "Error inserting wheel into DB. error=" + error.message + ", "

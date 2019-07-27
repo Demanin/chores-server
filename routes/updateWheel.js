@@ -1,4 +1,4 @@
-const postgres = require('../postgres-db');
+const Postgres = require('../Postgres');
 
 const updateWheel = async (req, res) => {
   const id = parseInt(req.params.id, 10);
@@ -39,7 +39,7 @@ const updateWheel = async (req, res) => {
 
   let result;
   try {
-    result = await postgres.wheels.find(id);
+    result = await Postgres.Wheels.find(id);
   } catch (error) {
     console.error("Error finding wheel in DB. error=" + error.message);
 
@@ -55,7 +55,7 @@ const updateWheel = async (req, res) => {
   }
 
   try {
-    await postgres.wheels.update({ id, title, turnList, isVisible, priority });
+    await Postgres.Wheels.update({ id, title, turnList, isVisible, priority });
   } catch (error) {
     console.error("Error updating wheel in DB. error=" + error.message);
     res.status(500);

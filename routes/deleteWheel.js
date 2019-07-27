@@ -1,10 +1,10 @@
-const postgres = require('../postgres-db');
+const Postgres = require('../Postgres');
 
 const deleteWheel = async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
   try {
-    await postgres.wheels.delete(id);
+    await Postgres.Wheels.delete(id);
   } catch (error) {
     console.error("Error removing wheel from DB. error=" + error.message);
     res.sendStatus(500);
