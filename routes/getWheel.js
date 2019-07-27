@@ -7,13 +7,13 @@ const getWheel = async (req, res) => {
   try {
     result = await postgres.wheels.find(id);
   } catch (error) {
-    console.error("Error finding wheel in DB. error="+error.message);
+    console.error("Error finding wheel in DB. error=" + error.message);
 
     return res.sendStatus(500);
   }
 
   if (!result || result.length === 0) {
-      console.error("Error finding wheel in DB. error="+error.message);
+      console.error("Error finding wheel in DB. error=" + error.message);
       res.status(404);
       res.json({ message: "wheel not found" });
 

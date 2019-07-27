@@ -6,7 +6,7 @@ const deleteWheel = async (req, res) => {
   try {
     await postgres.wheels.delete(id);
   } catch (error) {
-    console.error("Error removing wheel from DB. error="+error.message);
+    console.error("Error removing wheel from DB. error=" + error.message);
     res.sendStatus(500);
 
     return;

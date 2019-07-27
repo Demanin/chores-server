@@ -5,7 +5,7 @@ const getAllUsers = async (req, res) => {
   try {
     result = await postgres.users.all();
   } catch (error) {
-    console.error("Error finding users in DB. error="+error.message);
+    console.error("Error finding users in DB. error=" + error.message);
 
     return res.sendStatus(500);
   }

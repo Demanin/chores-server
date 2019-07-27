@@ -48,8 +48,8 @@ const createWheel = async (req, res) => {
     result = await postgres.wheels.insert({ ownerId, title, turnList, isVisible, priority });
   } catch (error) {
     console.error(
-      "Error inserting wheel into DB. error="+error.message+", "
-      +"title="+title+", turnList="+turnList.join()
+      "Error inserting wheel into DB. error=" + error.message + ", "
+      + "title=" + title + ", turnList=" + turnList.join()
     );
     res.status(500);
     res.json({ message: "Error creating wheel" });
@@ -57,7 +57,7 @@ const createWheel = async (req, res) => {
     return;
   }
 
-  console.log("Inserted wheel into DB. wheelId="+result.id);
+  console.log("Inserted wheel into DB. wheelId=" + result.id);
   res.status(200);
   res.json(result);
 };
