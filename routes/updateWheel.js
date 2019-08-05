@@ -6,33 +6,32 @@ const updateWheel = async (req, res) => {
   const isVisible = req.body.isVisible;
   if (!title){
     res.status(400);
-    res.json({ message: "Missing title" });
+    res.json({ message: 'Missing title' });
 
     return;
   }
-  if ("string" !== typeof title){
+  if ('string' !== typeof title){
     res.status(400);
-    res.json({ message: "title must be a string" });
+    res.json({ message: 'title must be a string' });
 
     return;
   }
-  if ("boolean" !== typeof isVisible){
+  if ('boolean' !== typeof isVisible){
     res.status(400);
-    res.json({ message: "isVisible must be a boolean" });
+    res.json({ message: 'isVisible must be a boolean' });
 
     return;
   }
   const turnList = req.body.turnList;
   if (!turnList) {
     res.status(400);
-    res.json({ message: "Missing turnList" });
+    res.json({ message: 'Missing turnList' });
 
     return;
   }
-  const priority = req.body.priority;
-  if (!priority) {
+  if (!req.body.hasOwnProperty('priority')) {
     res.status(400);
-    res.json({ message: "Missing priority" });
+    res.json({ message: 'Missing priority' });
 
     return;
   }
@@ -41,32 +40,29 @@ const updateWheel = async (req, res) => {
   try {
     result = await Postgres.Wheels.find(id);
   } catch (error) {
-    console.error("Error finding wheel in DB. error=" + error.message);
+    console.error('Error finding wheel in DB. error=' + error.message);
 
     return res.sendStatus(500);
   }
 
-  if (!result || result.length === 0) {
-    console.error("Error finding wheel in DB. error=" + error.message);
-    res.status(404);
-    res.json({ message: "wheel not found" });
-
-    return;
-  }
-
+  let updatedWheel;
   try {
-    await Postgres.Wheels.update({ id, title, turnList, isVisible, priority });
+    const priority = parseInt(req.body.priority, 10);
+    const currentTurn = parseInt(req.body.currentTurn, 10);
+    updatedWheel = await Postgres.Wheels.update(
+      { id, title, turnList, isVisible, priority, currentTurn }
+    );
   } catch (error) {
-    console.error("Error updating wheel in DB. error=" + error.message);
+    console.error('Error updating wheel in DB. error=' + error.message);
     res.status(500);
-    res.json({ message: "Error updating wheel." });
+    res.json({ message: 'Error updating wheel.' });
 
     return;
   }
 
-  console.log("Updated wheel in DB. wheelId=" + id);
+  console.log('Updated wheel in DB. wheelId=' + id);
   res.status(200);
-  res.json({title, turnList, isVisible, id});
+  res.json(updatedWheel);
 };
 
 module.exports = updateWheel;

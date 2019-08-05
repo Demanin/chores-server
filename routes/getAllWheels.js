@@ -5,7 +5,7 @@ const getAllWheels = async (req, res) => {
   try {
     result = await Postgres.Wheels.all();
   } catch (error) {
-    console.error("Error finding wheels in DB. error=" + error.message);
+    console.error('Error finding wheels in DB. error=' + error.message);
 
     return res.sendStatus(500);
   }
