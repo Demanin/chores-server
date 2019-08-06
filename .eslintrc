@@ -1,15 +1,16 @@
 {
   "extends": "eslint:recommended",
   "parserOptions": {
-    "ecmaVersion": 8
+    "ecmaVersion": 9
   },
   "env": {
     "node": true,
     "es6": true
   },
   "rules": {
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "quotes": ["error", "single"],
     "space-infix-ops": ["error"],
-    "space-unary-ops": ["error"],
-    "indent": ["error", 2]
+    "space-unary-ops": ["error"]
   }
 }
